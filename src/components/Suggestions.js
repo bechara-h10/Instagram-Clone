@@ -73,7 +73,7 @@ const User = styled.div`
   display: flex;
   gap: 20px;
   align-items: center;
-  padding: 36px 8px;
+  padding: 36px 16px 36px 8px;
   img {
     width: 56px;
     border-radius: 50%;
@@ -82,6 +82,7 @@ const User = styled.div`
   p {
     display: flex;
     flex-direction: column;
+    width: 100%;
     font-size: 16px;
     span:first-child {
       font-weight: 700;
@@ -113,7 +114,7 @@ const SuggestedUsers = styled.div`
 `;
 
 const UserSuggestion = styled(User)`
-  padding: 0 12px;
+  padding: 0 16px 0 8px;
   margin-top: 12px;
 `;
 
