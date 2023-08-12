@@ -11,7 +11,6 @@ function Main() {
       </StoryContainer>
       <PostContainer>
         <Post />
-        <Post />
       </PostContainer>
     </Container>
   );
@@ -42,6 +41,9 @@ const PostContainer = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 200px;
+  @media (width <= 768px) {
+    gap: 20px;
+  }
 `;
 
 export default Main;

@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import PostModal from "./PostModal";
 
 function Nav() {
+  const [showModal, setShowModal] = useState(false);
+  const handleClick = (e) => {
+    e.preventDefault();
+    if (showModal) {
+      setShowModal(false);
+    } else {
+      setShowModal(true);
+    }
+    console.log(showModal);
+  };
+
   return (
     <Container>
       <Content>
@@ -45,7 +57,7 @@ function Nav() {
               <span>Notifications</span>
             </a>
           </NavListItem>
-          <NavListItem className="create-item">
+          <NavListItem className="create-item" onClick={(e) => handleClick(e)}>
             <a>
               <img src="/images/add-icon.png" alt="" />
               <span>Create</span>
@@ -65,6 +77,7 @@ function Nav() {
           </NavListItem>
         </NavList>
       </Content>
+      <PostModal showModal={showModal} handleClick={(e) => handleClick(e)} />
     </Container>
   );
 }
