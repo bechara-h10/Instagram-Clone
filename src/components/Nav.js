@@ -76,6 +76,8 @@ const Container = styled.nav`
   left: 0;
   height: 100vh;
   border-right: solid 1px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  background-color: #fff;
   @media (width <= 768px) {
     bottom: 0;
     left: 0;
@@ -92,7 +94,7 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   height: 100vh;
-  padding: 24px 24px 48px 24px;
+  padding: 48px 24px 24px 24px;
   @media (width <= 768px) {
     flex-direction: row;
     height: auto;
