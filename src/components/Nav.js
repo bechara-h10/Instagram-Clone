@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import PostModal from "./PostModal";
+import { signOutAPI } from "../actions";
+import { connect } from "react-redux";
+import { Navigate } from "react-router-dom";
 
-function Nav() {
+function Nav(props) {
   const [showModal, setShowModal] = useState(false);
   const handleClick = (e) => {
     e.preventDefault();
@@ -11,11 +14,11 @@ function Nav() {
     } else {
       setShowModal(true);
     }
-    console.log(showModal);
   };
 
   return (
     <Container>
+      {!props.user && <Navigate to={"/"} />}
       <Content>
         <Logo>
           <img src="/images/logo.png" alt="" />
@@ -57,16 +60,32 @@ function Nav() {
               <span>Notifications</span>
             </a>
           </NavListItem>
-          <NavListItem className="create-item" onClick={(e) => handleClick(e)}>
+          <NavListItem
+            className="create-item"
+            onClick={(e) => {
+              if (!props.loading) {
+                handleClick(e);
+              }
+            }}
+          >
             <a>
               <img src="/images/add-icon.png" alt="" />
               <span>Create</span>
             </a>
           </NavListItem>
-          <NavListItem className="user-img">
+          <NavListItem className="user-img" onClick={() => props.signOut()}>
             <a>
-              <img src="/images/user.svg" alt="" />
-              <span>Profile</span>
+              {props.user ? (
+                <>
+                  <img src={props.user.photoURL} alt="" />
+                  <span>{props.user.displayName}</span>
+                </>
+              ) : (
+                <>
+                  <img src="/images/user.svg" alt="" />
+                  <span>Profile</span>{" "}
+                </>
+              )}
             </a>
           </NavListItem>
           <NavListItem className="more-item">
@@ -174,6 +193,8 @@ const NavListItem = styled.li`
   @media (width<=768px) {
     a {
       gap: 5px;
+      flex-direction: column;
+      margin: 8px 0;
     }
     &.search-item,
     &.messages-item,
@@ -184,4 +205,17 @@ const NavListItem = styled.li`
   }
 `;
 
-export default Nav;
+const mapStateToProps = (state) => {
+  return {
+    user: state.userState.user,
+    loading: state.postState.loading,
+  };
+};
+
+const mapDispacthToProps = (dispatch) => {
+  return {
+    signOut: () => dispatch(signOutAPI()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispacthToProps)(Nav);

@@ -1,40 +1,60 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { AiOutlineEllipsis } from "react-icons/ai";
+import { likePostAPI } from "../actions";
+import { connect } from "react-redux";
 
 function Post(props) {
   const [comment, setComment] = useState("");
+  const likePost = (e) => {
+    e.preventDefault();
+    props.likePost(props.postId, props.user);
+  };
+  console.log(props);
   return (
     <Container>
       <PostInfo>
         <div>
-          <img src="/images/user.svg" alt="" />
+          <img src={props.actorImage} alt="" />
         </div>
         <div>
-          <a>user_name</a>
+          <a>{props.actorName}</a>
           <span>{new Date().toDateString()}</span>
+          <span>{props.location}</span>
         </div>
         <div>
           <AiOutlineEllipsis />
         </div>
       </PostInfo>
       <PostContent>
-        <img src="logo192.png" alt="" />
+        <img src={props.image} alt="" />
       </PostContent>
       <UserInterractions>
-        <img src="/images/heart-icon.png" alt="" />
+        {props.user && props.likedBy.indexOf(props.user.email) === -1 ? (
+          <img
+            src="/images/heart-icon.png"
+            alt=""
+            onClick={(e) => likePost(e)}
+          />
+        ) : (
+          <img
+            src="/images/heart-icon-filled.png"
+            alt=""
+            onClick={(e) => likePost(e)}
+          />
+        )}
         <img src="/images/comments-icon.png" alt="" />
         <img src="/images/send-icon.png" alt="" />
         <img src="/images/save-icon.png" alt="" />
       </UserInterractions>
       <Description>
-        <p>18 Likes</p>
+        <p>{props.likes} Likes</p>
         <p>
-          <span>user_name</span> The react js logo
+          <span>{props.actorName}</span> {props.caption}
         </p>
       </Description>
       <Comments>
-        <p>View all 3 comments</p>
+        <p>View all {props.comments} comments</p>
         <input
           type="text"
           placeholder="Add a comment..."
@@ -51,7 +71,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 75%;
-  height: 100vh;
 `;
 
 const PostInfo = styled.div`
@@ -168,4 +187,17 @@ const Comments = styled.div`
   }
 `;
 
-export default Post;
+const mapStateToProps = (state) => {
+  return {
+    posts: state.postState.posts,
+    user: state.userState.user,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    likePost: (postId, payload) => dispatch(likePostAPI(postId, payload)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Post);

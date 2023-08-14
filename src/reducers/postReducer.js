@@ -1,8 +1,4 @@
-import {
-  GET_POSTS,
-  SET_LOADING_STATUS,
-  LIKE_POST,
-} from "../actions/actionType";
+import { GET_POSTS, SET_LOADING_STATUS } from "../actions/actionType";
 
 const initialState = {
   loading: false,

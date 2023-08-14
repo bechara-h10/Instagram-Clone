@@ -1,42 +1,48 @@
 import React from "react";
 import styled from "styled-components";
+import { signInAPI } from "../actions";
+import { connect } from "react-redux";
+import { Navigate } from "react-router-dom";
 
-function Login() {
+function Login(props) {
   return (
-    <Container>
-      <Content>
-        <LoggedInAccounts>
-          <img src="/images/logo.png" alt="" />
-          <img src="/images/user.svg" alt="" />
-          <button>Continue as user</button>
-          <a>Remove Account</a>
-        </LoggedInAccounts>
-        <SignIn>
-          <p>Not user?</p>
-          <p>
-            <span>Switch Accounts</span> or <span>Sign Up</span>
-          </p>
-        </SignIn>
-        <GetApp>
-          <p>Get the app</p>
-          <a href="#">
-            <img
-              src="https://static.cdninstagram.com/rsrc.php/v3/yz/r/c5Rp7Ym-Klz.png"
-              alt=""
-            />
-          </a>
-          <a
-            href="#
+    <>
+      {props.user && <Navigate to={"/home"} />}
+      <Container>
+        <Content>
+          <LoggedInAccounts>
+            <img src="/images/logo.png" alt="" />
+            <img src="/images/user.svg" alt="" />
+            <button onClick={() => props.signIn()}>Continue as user</button>
+            <a>Remove Account</a>
+          </LoggedInAccounts>
+          <SignIn>
+            <p>Not user?</p>
+            <p>
+              <span>Switch Accounts</span> or <span>Sign Up</span>
+            </p>
+          </SignIn>
+          <GetApp>
+            <p>Get the app</p>
+            <a href="#">
+              <img
+                src="https://static.cdninstagram.com/rsrc.php/v3/yz/r/c5Rp7Ym-Klz.png"
+                alt=""
+              />
+            </a>
+            <a
+              href="#
           "
-          >
-            <img
-              src="https://static.cdninstagram.com/rsrc.php/v3/yu/r/EHY6QnZYdNX.png"
-              alt=""
-            />
-          </a>
-        </GetApp>
-      </Content>
-    </Container>
+            >
+              <img
+                src="https://static.cdninstagram.com/rsrc.php/v3/yu/r/EHY6QnZYdNX.png"
+                alt=""
+              />
+            </a>
+          </GetApp>
+        </Content>
+      </Container>
+    </>
   );
 }
 
@@ -132,4 +138,13 @@ const GetApp = styled.div`
     }
   }
 `;
-export default Login;
+
+const mapStateToProps = (state) => ({
+  user: state.userState.user,
+});
+
+const mapDispacthToProps = (dispatch) => ({
+  signIn: () => dispatch(signInAPI()),
+});
+
+export default connect(mapStateToProps, mapDispacthToProps)(Login);

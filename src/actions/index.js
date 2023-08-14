@@ -10,16 +10,9 @@ import {
   addDoc,
   getDoc,
   updateDoc,
-  increment,
-  arrayUnion,
 } from "firebase/firestore";
 import { signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
-import {
-  GET_POSTS,
-  SET_LOADING_STATUS,
-  SET_USER,
-  LIKE_POST,
-} from "./actionType";
+import { GET_POSTS, SET_LOADING_STATUS, SET_USER } from "./actionType";
 
 export const setUser = (payload) => ({
   type: SET_USER,

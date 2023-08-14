@@ -1,9 +1,15 @@
 import "./App.css";
+import { useEffect } from "react";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { getUserAuth } from "./actions";
+import { connect } from "react-redux";
 
-function App() {
+function App(props) {
+  useEffect(() => {
+    props.getUserAuth();
+  }, []);
   return (
     <div className="App">
       <Router>
@@ -16,4 +22,14 @@ function App() {
   );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {};
+};
+
+const mapDispacthToProps = (dispatch) => {
+  return {
+    getUserAuth: () => dispatch(getUserAuth()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispacthToProps)(App);

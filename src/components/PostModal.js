@@ -2,9 +2,14 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { BsArrowLeft, BsChevronDown } from "react-icons/bs";
 import { CiLocationOn } from "react-icons/ci";
+import { addPostsAPI } from "../actions";
+import { connect } from "react-redux";
+import { Timestamp } from "firebase/firestore";
 
 function PostModal(props) {
   const [shareImage, setShareImage] = useState("");
+  const [editorText, setEditorText] = useState("");
+  const [location, setLocation] = useState("");
   const handleChange = (e) => {
     const image = e.target.files[0];
     if (image === "" || image === undefined) {
@@ -13,8 +18,28 @@ function PostModal(props) {
     }
     setShareImage(image);
   };
+
+  const addPost = (e) => {
+    e.preventDefault();
+    if (e.target !== e.currentTarget) {
+      return;
+    }
+    const payload = {
+      image: shareImage,
+      user: props.user,
+      caption: editorText,
+      timestamp: Timestamp.now(),
+      location: location,
+    };
+    props.addPost(payload);
+    console.log(props.loading);
+    reset(e);
+  };
+
   const reset = (e) => {
     setShareImage("");
+    setEditorText("");
+    setLocation("");
     props.handleClick(e);
   };
   return (
@@ -25,7 +50,12 @@ function PostModal(props) {
             <Navigation>
               <BsArrowLeft onClick={(e) => reset(e)} />
               <span>Create a post</span>
-              <button>Share</button>
+              <button
+                onClick={(e) => addPost(e)}
+                disabled={!editorText || !shareImage ? true : false}
+              >
+                Share
+              </button>
             </Navigation>
             <PostContent>
               <Upload>
@@ -50,12 +80,32 @@ function PostModal(props) {
               </Upload>
               <Info>
                 <div className="user-container">
-                  <img src="/images/user.svg" alt="" />
-                  <a>user_name</a>
+                  {props.user ? (
+                    <>
+                      {" "}
+                      <img src={props.user.photoURL} alt="" />
+                      <a>{props.user.displayName}</a>
+                    </>
+                  ) : (
+                    <>
+                      <img src="/images/user.svg" alt="" />
+                      <a>user_name</a>
+                    </>
+                  )}
                 </div>
-                <textarea placeholder="Write a caption" rows="10" />
+                <textarea
+                  placeholder="Write a caption"
+                  rows="10"
+                  value={editorText}
+                  onChange={(e) => setEditorText(e.target.value)}
+                />
                 <div className="location-container">
-                  <input type="text" placeholder="Add a location" />
+                  <input
+                    type="text"
+                    placeholder="Add a location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  />
                   <CiLocationOn />
                 </div>
                 <div className="options-container">
@@ -119,6 +169,9 @@ const Navigation = styled.div`
     cursor: pointer;
     &:hover {
       color: #fff;
+    }
+    &:disabled {
+      color: #777;
     }
   }
 `;
@@ -210,4 +263,17 @@ const Info = styled.div`
   }
 `;
 
-export default PostModal;
+const mapStateToProps = (state) => {
+  return {
+    user: state.userState.user,
+    loading: state.postState.loading,
+  };
+};
+
+const mapDispacthToProps = (dispatch) => {
+  return {
+    addPost: (payload) => dispatch(addPostsAPI(payload)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispacthToProps)(PostModal);
