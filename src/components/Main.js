@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Story from "./Story";
 import Post from "./Post";
+import BottomSheet from "./BottomSheet";
 import { getPostsAPI } from "../actions";
 import { connect } from "react-redux";
 
@@ -32,6 +33,7 @@ function Main(props) {
                 date={post.actor.date}
                 caption={post.caption}
                 comments={post.comments}
+                commentedBy={post.commentedBy}
                 likes={post.likes}
                 location={post.location}
                 image={post.sharedImg}
@@ -69,10 +71,7 @@ const PostContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 200px;
-  @media (width <= 768px) {
-    gap: 50px;
-  }
+  gap: 50px;
 `;
 
 const Loader = styled.div`

@@ -76,41 +76,46 @@ export function getPostsAPI() {
 export function addPostsAPI(payload) {
   return (dispatch) => {
     if (payload.image !== "") {
-      dispatch(setLoading(true));
-      const imageRef = ref(storage, `images/${payload.image.name}`);
-      const file = payload.image;
-      const uploadTask = uploadBytesResumable(imageRef, file);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            snapshot.bytesTransferred / snapshot.totalBytes / 100;
-          if (snapshot.state === "RUNNING") {
-            console.log(`Progress: ${progress}`);
+      try {
+        dispatch(setLoading(true));
+        const imageRef = ref(storage, `images/${payload.image.name}`);
+        const file = payload.image;
+        const uploadTask = uploadBytesResumable(imageRef, file);
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              snapshot.bytesTransferred / snapshot.totalBytes / 100;
+            if (snapshot.state === "RUNNING") {
+              console.log(`Progress: ${progress}`);
+            }
+          },
+          (error) => {
+            console.log(error);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(imageRef);
+            await addDoc(collection(db, "posts"), {
+              actor: {
+                email: payload.user.email,
+                name: payload.user.displayName,
+                date: payload.timestamp,
+                image: payload.user.photoURL,
+              },
+              sharedImg: downloadURL,
+              comments: 0,
+              commentedBy: [],
+              likes: 0,
+              likedBy: [],
+              caption: payload.caption,
+              location: payload.location,
+            });
           }
-        },
-        (error) => {
-          console.log(error);
-        },
-        async () => {
-          const downloadURL = await getDownloadURL(imageRef);
-          await addDoc(collection(db, "posts"), {
-            actor: {
-              email: payload.user.email,
-              name: payload.user.displayName,
-              date: payload.timestamp,
-              image: payload.user.photoURL,
-            },
-            sharedImg: downloadURL,
-            comments: 0,
-            likes: 0,
-            likedBy: [],
-            caption: payload.caption,
-            location: payload.location,
-          });
-        }
-      );
-      dispatch(setLoading(false));
+        );
+        dispatch(setLoading(false));
+      } catch (error) {
+        alert("Error occured!");
+      }
     }
   };
 }
@@ -135,6 +140,28 @@ export function likePostAPI(postId, user) {
       await updateDoc(postRef, {
         likes: likedByArray.length,
         likedBy: likedByArray,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
+
+export function addCommentAPI(postId, text, user) {
+  return async (dispatch) => {
+    const postRef = doc(db, "posts", postId);
+    try {
+      const postSnap = await getDoc(postRef);
+      if (!postSnap.exists()) {
+        console.log("Post not found");
+        return;
+      }
+      const postDoc = postSnap.data();
+      const commentedByArray = postDoc.commentedBy || [];
+      commentedByArray.push({ text: text, by: user.email });
+      await updateDoc(postRef, {
+        comments: commentedByArray.length,
+        commentedBy: commentedByArray,
       });
     } catch (error) {
       console.log(error);

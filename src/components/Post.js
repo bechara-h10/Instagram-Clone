@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { AiOutlineEllipsis } from "react-icons/ai";
-import { likePostAPI } from "../actions";
+import { addCommentAPI, likePostAPI } from "../actions";
 import { connect } from "react-redux";
+import BottomSheet from "./BottomSheet";
 
 function Post(props) {
   const [comment, setComment] = useState("");
+  const [itemsVisible, setItemsVisible] = useState(true);
+  const [sheetVisible, setSheetVisible] = useState(false);
   const likePost = (e) => {
     e.preventDefault();
     props.likePost(props.postId, props.user);
   };
-  console.log(props);
+  const commentOnPost = (e) => {
+    e.preventDefault();
+    props.addComment(props.postId, comment, props.user);
+    setComment("");
+  };
   return (
     <Container>
       <PostInfo>
@@ -54,15 +61,28 @@ function Post(props) {
         </p>
       </Description>
       <Comments>
-        <p>View all {props.comments} comments</p>
+        <p onClick={() => setSheetVisible(true)}>
+          View all {props.comments} comments
+        </p>
         <input
           type="text"
           placeholder="Add a comment..."
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-        <button disabled={!comment ? true : false}>Post</button>
+        <button
+          disabled={!comment ? true : false}
+          onClick={(e) => commentOnPost(e)}
+        >
+          Post
+        </button>
       </Comments>
+      <BottomSheet
+        setSheetVisible={(item) => setSheetVisible(item)}
+        sheetVisible={sheetVisible}
+        setItemsVisible={(item) => setItemsVisible(item)}
+        cardDetail={props.commentedBy}
+      />
     </Container>
   );
 }
@@ -71,6 +91,9 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 75%;
+  @media (width <= 768px) {
+    width: 100%;
+  }
 `;
 
 const PostInfo = styled.div`
@@ -162,6 +185,9 @@ const Comments = styled.div`
   margin-top: 8px;
   color: rgba(0, 0, 0, 0.6);
   position: relative;
+  p {
+    cursor: pointer;
+  }
   input {
     width: 100%;
     margin-top: 8px;
@@ -181,6 +207,7 @@ const Comments = styled.div`
     outline: none;
     font-size: 14px;
     font-weight: 700;
+    cursor: pointer;
     &:disabled {
       display: none;
     }
@@ -197,6 +224,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     likePost: (postId, payload) => dispatch(likePostAPI(postId, payload)),
+    addComment: (postId, text, payload) =>
+      dispatch(addCommentAPI(postId, text, payload)),
   };
 };
 

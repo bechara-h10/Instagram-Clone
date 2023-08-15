@@ -108,7 +108,7 @@ const Container = styled.nav`
   left: 0;
   height: 100vh;
   border-right: solid 1px rgba(0, 0, 0, 0.15);
-  z-index: 100;
+  z-index: 10;
   background-color: #fff;
   @media (width <= 768px) {
     bottom: 0;
